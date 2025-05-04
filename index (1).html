@@ -1,0 +1,511 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feugang Wobiwo Lyrette Joys</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sacramento&Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #4a0e4e, #c2185b, #ff6f91, #ffccd5);
+            background-size: 600%;
+            font-family: 'Sacramento', cursive;
+            overflow: hidden;
+            animation: gradientFlow 25s ease infinite;
+            position: relative;
+        }
+
+        /* Heart overlay */
+        .heart-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>') repeat;
+            opacity: 0.15;
+            animation: fadeHearts 10s ease-in-out infinite;
+        }
+
+        .container {
+            text-align: center;
+            color: #fff;
+            z-index: 2;
+            padding: 2rem;
+            animation: fadeIn 4s ease-in-out;
+        }
+
+        h1 {
+            font-size: 8vw;
+            max-font-size: 5rem;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255, 105, 180, 0.9), 0 0 60px rgba(255, 105, 180, 0.7);
+            padding: 2vw 4vw;
+            border-radius: 2rem;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            animation: typewriter 4s steps(40, end) forwards, sparkle 2s infinite;
+            border: 2px solid rgba(255, 182, 193, 0.5);
+        }
+
+        h1::after {
+            content: '|';
+            position: absolute;
+            right: 0;
+            animation: blink 0.5s step-end infinite;
+        }
+
+        h1:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 40px rgba(255, 105, 180, 1), 0 0 80px rgba(255, 105, 180, 0.8);
+        }
+
+        .love-messages {
+            margin-top: 2rem;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .love-message {
+            font-size: 3vw;
+            max-font-size: 2rem;
+            color: #ffe4e1;
+            text-shadow: 0 0 20px rgba(255, 182, 193, 0.9);
+            opacity: 0;
+            transform: translateY(1rem);
+            animation: fadeInMessage 3s ease-in-out forwards, cycleMessages 12s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .love-message:nth-child(1) { animation-delay: 3s, 0s; }
+        .love-message:nth-child(2) { animation-delay: 4.5s, 3s; }
+        .love-message:nth-child(3) { animation-delay: 6s, 6s; }
+        .love-message:nth-child(4) { animation-delay: 7.5s, 9s; }
+
+        .love-message::before {
+            content: '♥';
+            font-size: 1.5rem;
+            color: #ff69b4;
+            animation: pulseHeart 2s ease-in-out infinite;
+        }
+
+        .surprise-btn {
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.5rem;
+            color: #fff;
+            background: rgba(255, 105, 180, 0.5);
+            border: 2px solid rgba(255, 182, 193, 0.7);
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0. peer 3s ease;
+        }
+
+        .surprise-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 105, 180, 0.8);
+        }
+
+        .surprise-message {
+            font-size: 2.5rem;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+            margin-top: 1rem;
+            opacity: 0;
+            transform: translateY(1rem);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .surprise-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Animations */
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeHearts {
+            0% { opacity: 0.15; }
+            50% { opacity: 0.05; }
+            100% { opacity: 0.15; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(2rem); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        @keyframes sparkle {
+            0% { text-shadow: 0 0 30px rgba(255, 105, 180, 0.9), 0 0 60px rgba(255, 105, 180, 0.7); }
+            50% { text-shadow: 0 0 35px rgba(255, 105, 180, 1), 0 0 70px rgba(255, 105, 180, 0.9); }
+            100% { text-shadow: 0 0 30px rgba(255, 105, 180, 0.9), 0 0 60px rgba(255, 105, 180, 0.7); }
+        }
+
+        @keyframes fadeInMessage {
+            0% { opacity: 0; transform: translateY(1rem); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes cycleMessages {
+            0% { opacity: 1; }
+            25% { opacity: 1; }
+            30% { opacity: 0; }
+            95% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes pulseHeart {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* Particle canvas */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            opacity: 0.7;
+            transform: translateZ(0);
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            h1 {
+                font-size: 6vw;
+                padding: 1.5rem 3rem;
+            }
+            .love-message {
+                font-size: 2.5vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 5vw;
+                padding: 1rem 2rem;
+            }
+            .love-message {
+                font-size: 2vw;
+            }
+            .surprise-btn {
+                font-size: 1.2rem;
+                padding: 0.8rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                flex-direction: column;
+                justify-content: flex-start;
+                padding-top: 2rem;
+            }
+            .container {
+                padding: 0.5rem;
+            }
+            h1 {
+                font-size: 8vw;
+                max-font-size: 2.5rem;
+                padding: 0.8rem 1.5rem;
+            }
+            .love-messages {
+                margin-top: 1rem;
+            }
+            .love-message {
+                font-size: 4vw;
+                max-font-size: 1.3rem;
+            }
+            .surprise-btn {
+                font-size: 1rem;
+                padding: 0.6rem 1.2rem;
+            }
+            .surprise-message {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            h1 {
+                font-size: 7vw;
+                padding: 0.6rem 1rem;
+            }
+            .love-message {
+                font-size: 3.5vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="heart-overlay"></div>
+    <canvas id="bgCanvas"></canvas>
+    <div class="container">
+        <h1>Feugang Wobiwo Lyrette Joys</h1>
+        <div class="love-messages">
+            <p class="love-message">Ton sourire éclaire mes nuits les plus sombres</p>
+            <p class="love-message">Mon cœur danse au rythme de ton amour</p>
+            <p class="love-message">Chaque seconde avec toi est un rêve éveillé</p>
+            <p class="love-message">Ma petite sorcière, tu ensorcelles mon âme</p>
+        </div>
+        <button class="surprise-btn" onclick="showSurprise()">Une surprise pour toi</button>
+        <p class="surprise-message" id="surpriseMessage">Je t’aimerai jusqu’à ce que les étoiles s’éteignent</p>
+    </div>
+    <audio id="bgMusic" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2023/02/14/audio_1e1e6c6b7e.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+        // Particle animation with parallax effect
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = 150;
+
+        class Particle {
+            constructor() {
+                this.reset();
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.2 - 0.1;
+                this.speedY = Math.random() * 0.2 - 0.1;
+                this.color = `hsl(${Math.random() * 20 + 340}, 90%, 85%)`;
+                this.opacity = Math.random() * 0.4 + 0.6;
+                this.twinklePhase = Math.random() * Math.PI * 2;
+                this.z = Math.random() * 2; // For parallax effect
+            }
+
+            reset() {
+                const t = Math.random() * Math.PI * 2;
+                const scale = Math.random() * (window.innerWidth < 768 ? 50 : 80) + 60;
+                this.x = canvas.width / 2 + scale * (16 * Math.pow(Math.sin(t), 3)) / 16;
+                this.y = canvas.height / 2 - scale * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16;
+            }
+
+            update() {
+                this.x += this.speedX / (this.z + 1);
+                this.y += this.speedY / (this.z + 1);
+                this.twinklePhase += 0.05;
+                this.opacity = 0.6 + Math.sin(this.twinklePhase) * 0.2;
+
+                if (this.size > 0.2) this.size -= 0.01;
+
+                if (this.size <= 0.2 || Math.abs(this.x - canvas.width / 2) > canvas.width / 2 || Math.abs(this.y - canvas.height / 2) > canvas.height / 2) {
+                    this.reset();
+                    this.size = Math.random() * 2 + 1;
+                    this.opacity = Math.random() * 0.4 + 0.6;
+                }
+            }
+
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size / (this.z + 1), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function connectParticles() {
+            const maxDistance = window.innerWidth < 768 ? 70 : 90;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < maxDistance) {
+                        ctx.globalAlpha = (1 - distance / maxDistance) * 0.3;
+                        ctx.strokeStyle = `rgba(255, 182, 193, ${1 - distance / maxDistance})`;
+                        ctx.lineWidth = 0.6;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[j].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                        ctx.globalAlpha = 1;
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((particle) => {
+                particle.update();
+                particle.draw();
+            });
+            connectParticles();
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Cursor trail effect
+        const trailCanvas = document.createElement('canvas');
+        trailCanvas.style.position = 'absolute';
+        trailCanvas.style.top = '0';
+        trailCanvas.style.left = '0';
+        trailCanvas.style.pointerEvents = 'none';
+        trailCanvas.style.zIndex = '3';
+        document.body.appendChild(trailCanvas);
+        trailCanvas.width = window.innerWidth;
+        trailCanvas.height = window.innerHeight;
+
+        const trailCtx = trailCanvas.getContext('2d');
+        const trailParticles = [];
+
+        class TrailParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 3;
+                this.opacity = 0.8;
+            }
+
+            update() {
+                this.size -= 0.2;
+                this.opacity -= 0.05;
+            }
+
+            draw() {
+                trailCtx.globalAlpha = this.opacity;
+                trailCtx.fillStyle = 'rgba(255, 105, 180, 0.8)';
+                trailCtx.beginPath();
+                trailCtx.moveTo(this.x, this.y - this.size);
+                trailCtx.lineTo(this.x - this.size, this.y + this.size);
+                trailCtx.lineTo(this.x + this.size, this.y + this.size);
+                trailCtx.closePath();
+                trailCtx.fill();
+                trailCtx.globalAlpha = 1;
+            }
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            trailParticles.push(new TrailParticle(e.clientX, e.clientY));
+        });
+
+        function animateTrail() {
+            trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+            trailParticles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.size <= 0.2 || particle.opacity <= 0) {
+                    trailParticles.splice(index, 1);
+                }
+            });
+            requestAnimationFrame(animateTrail);
+        }
+
+        animateTrail();
+
+        window.addEventListener('resize', () => {
+            trailCanvas.width = window.innerWidth;
+            trailCanvas.height = window.innerHeight;
+        });
+
+        // Surprise message and particle burst
+        function showSurprise() {
+            const surpriseMessage = document.getElementById('surpriseMessage');
+            surpriseMessage.classList.add('show');
+
+            // Particle burst
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        // Audio control
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = 0.3;
+        bgMusic.play().catch(() => {
+            document.addEventListener('click', () => bgMusic.play(), { once: true });
+        });
+    </script>
+</body>
+</html>
